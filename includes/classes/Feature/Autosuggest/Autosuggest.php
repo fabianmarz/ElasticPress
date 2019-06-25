@@ -268,6 +268,7 @@ class Autosuggest extends Feature {
 							'term_suggest',
 						)
 					),
+					'searchQuery'  => '', // @todo Integrate Search Query
 					'action'       => 'navigate',
 				)
 			)
