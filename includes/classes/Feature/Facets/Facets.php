@@ -333,8 +333,8 @@ checked<?php endif; ?> value="any"><?php echo wp_kses_post( __( 'Show all conten
 			$query_string .= 's=' . $s;
 		}
 
-		if ( ! empty( $filters['taxonomies'] ) ) {
-			$tax_filters = $filters['taxonomies'];
+		if ( ! empty( $filters ) ) {
+			$tax_filters = $filters;
 
 			foreach ( $tax_filters as $taxonomy => $filter ) {
 				if ( ! empty( $filter['terms'] ) ) {
@@ -342,7 +342,7 @@ checked<?php endif; ?> value="any"><?php echo wp_kses_post( __( 'Show all conten
 						$query_string .= '&';
 					}
 
-					$query_string .= 'filter_' . $taxonomy . '=' . implode( array_keys( $filter['terms'] ), ',' );
+					$query_string .= 'filter_' . wc_attribute_taxonomy_slug( $taxonomy ) . '=' . implode( array_values( $filter['terms'] ), ',' );
 				}
 			}
 		}

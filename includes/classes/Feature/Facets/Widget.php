@@ -141,9 +141,9 @@ class Widget extends WP_Widget {
 			?>
 
 			<div class="inner">
-				<?php if ( ! empty( $selected_filters['taxonomies'][ $taxonomy ] ) ) : ?>
+				<?php if ( ! empty( $selected_filters[ $taxonomy ] ) ) : ?>
 					<?php
-					foreach ( $selected_filters['taxonomies'][ $taxonomy ]['terms'] as $term_slug => $value ) :
+					foreach ( $selected_filters[ $taxonomy ]['terms'] as $nothing => $term_slug ) :
 						if ( ! empty( $outputted_terms[ $term_slug ] ) ) {
 							continue;
 						}
@@ -154,8 +154,8 @@ class Widget extends WP_Widget {
 							$outputted_terms[ $term_slug ] = $term;
 							$new_filters                   = $selected_filters;
 
-							if ( ! empty( $new_filters['taxonomies'][ $taxonomy ] ) && ! empty( $new_filters['taxonomies'][ $taxonomy ]['terms'][ $term_slug ] ) ) {
-								unset( $new_filters['taxonomies'][ $taxonomy ]['terms'][ $term_slug ] );
+							if ( ! empty( $new_filters[ $taxonomy ] ) && ! empty( $new_filters[ $taxonomy ]['terms'][ $term_slug ] ) ) {
+								unset( $new_filters[ $taxonomy ]['terms'][ $term_slug ] );
 							}
 							?>
 							<div class="term selected level-<?php echo (int) $term->level; ?>" data-term-name="<?php echo esc_attr( strtolower( $term->name ) ); ?>" data-term-slug="<?php echo esc_attr( strtolower( $term_slug ) ); ?>">
@@ -190,7 +190,7 @@ class Widget extends WP_Widget {
 
 							$flat_ordered_terms[] = $top_of_tree;
 
-							$to_process = $this->order_by_selected( $top_of_tree->children, $selected_filters['taxonomies'][ $taxonomy ]['terms'] );
+							$to_process = $this->order_by_selected( $top_of_tree->children, $selected_filters[ $taxonomy ]['terms'] );
 
 							while ( ! empty( $to_process ) ) {
 								$term = array_shift( $to_process );
@@ -198,27 +198,27 @@ class Widget extends WP_Widget {
 								$flat_ordered_terms[] = $term;
 
 								if ( ! empty( $term->children ) ) {
-									$to_process = array_merge( $this->order_by_selected( $term->children, $selected_filters['taxonomies'][ $taxonomy ]['terms'] ), $to_process );
+									$to_process = array_merge( $this->order_by_selected( $term->children, $selected_filters[ $taxonomy ]['terms'] ), $to_process );
 								}
 							}
 
 							foreach ( $flat_ordered_terms as $term ) {
-								$selected                       = ! empty( $selected_filters['taxonomies'][ $taxonomy ]['terms'][ $term->slug ] );
+								$selected                       = ! empty( $selected_filters[ $taxonomy ]['terms'][ $term->slug ] );
 								$outputted_terms[ $term->slug ] = $term;
 								$new_filters                    = $selected_filters;
 
 								if ( $selected ) {
-									if ( ! empty( $new_filters['taxonomies'][ $taxonomy ] ) && ! empty( $new_filters['taxonomies'][ $taxonomy ]['terms'][ $term->slug ] ) ) {
-										unset( $new_filters['taxonomies'][ $taxonomy ]['terms'][ $term->slug ] );
+									if ( ! empty( $new_filters[ $taxonomy ] ) && ! empty( $new_filters[ $taxonomy ]['terms'][ $term->slug ] ) ) {
+										unset( $new_filters[ $taxonomy ]['terms'][ $term->slug ] );
 									}
 								} else {
-									if ( empty( $new_filters['taxonomies'][ $taxonomy ] ) ) {
-										$new_filters['taxonomies'][ $taxonomy ] = array(
+									if ( empty( $new_filters[ $taxonomy ] ) ) {
+										$new_filters[ $taxonomy ] = array(
 											'terms' => array(),
 										);
 									}
 
-									$new_filters['taxonomies'][ $taxonomy ]['terms'][ $term->slug ] = true;
+									$new_filters[ $taxonomy ]['terms'][ $term->slug ] = true;
 								}
 								?>
 								<div class="term <?php if ( empty( $term->count ) ) : ?>empty-term<?php endif; ?> <?php if ( $selected ) : ?>selected<?php endif; ?> level-<?php echo (int) $term->level; ?>" data-term-name="<?php echo esc_attr( strtolower( $term->name ) ); ?>" data-term-slug="<?php echo esc_attr( strtolower( $term->slug ) ); ?>">
@@ -242,13 +242,13 @@ class Widget extends WP_Widget {
 
 					$new_filters = $selected_filters;
 
-					if ( empty( $new_filters['taxonomies'][ $taxonomy ] ) ) {
-						$new_filters['taxonomies'][ $taxonomy ] = array(
+					if ( empty( $new_filters[ $taxonomy ] ) ) {
+						$new_filters[ $taxonomy ] = array(
 							'terms' => array(),
 						);
 					}
 
-					$new_filters['taxonomies'][ $taxonomy ]['terms'][ $term->slug ] = true;
+					$new_filters[ $taxonomy ]['terms'][ $term->slug ] = true;
 					?>
 					<div class="term <?php if ( empty( $term->count ) ) : ?>empty-term<?php endif; ?> level-<?php echo (int) $term->level; ?>" data-term-name="<?php echo esc_attr( strtolower( $term->name ) ); ?>" data-term-slug="<?php echo esc_attr( strtolower( $term->slug ) ); ?>">
 						<a <?php if ( ! empty( $term->count ) ) : ?>href="<?php echo esc_attr( $feature->build_query_url( $new_filters ) ); ?>"<?php endif; ?>>
