@@ -250,7 +250,7 @@ checked<?php endif; ?> value="any"><?php echo wp_kses_post( __( 'Show all conten
 
 		$query->set( 'aggs', $aggs );
 
-		$selected_filters = $this->get_selected();
+		$selected_filters = \WC_Query::get_layered_nav_chosen_attributes();
 
 		$settings = $this->get_settings();
 
@@ -262,17 +262,28 @@ checked<?php endif; ?> value="any"><?php echo wp_kses_post( __( 'Show all conten
 		);
 
 		$tax_query = $query->get( 'tax_query', [] );
+		// Get current tax query taxonomies to prevent duplicates beeing added.
+		$current_taxonomies = wp_list_pluck(
+			array_filter( $tax_query, 'is_numeric', ARRAY_FILTER_USE_KEY ),
+			'taxonomy',
+			'taxonomy'
+		);
 
-		foreach ( $selected_filters['taxonomies'] as $taxonomy => $filter ) {
+		foreach ( $selected_filters as $taxonomy => $filter ) {
+			// If taxonomy exists in the selected filters already, skip.
+			// For sake of perormance, use isset instead of in_array.
+			if ( isset( $current_taxonomies[ $taxonomy ] ) ) {
+				continue;
+			}
 			$tax_query[] = [
 				'taxonomy' => $taxonomy,
 				'field'    => 'slug',
-				'terms'    => array_keys( $filter['terms'] ),
+				'terms'    => $filter['terms'],
 				'operator' => ( 'any' === $settings['match_type'] ) ? 'or' : 'and',
 			];
 		}
 
-		if ( ! empty( $selected_filters['taxonomies'] ) && 'any' === $settings['match_type'] ) {
+		if ( ! empty( $selected_filters ) && 'any' === $settings['match_type'] ) {
 			$tax_query['relation'] = 'or';
 		}
 
@@ -304,30 +315,6 @@ checked<?php endif; ?> value="any"><?php echo wp_kses_post( __( 'Show all conten
 				}
 			}
 		}
-	}
-
-	/**
-	 * Get currently selected facets from query args
-	 *
-	 * @since  2.5
-	 * @return array
-	 */
-	public function get_selected() {
-		$filters = array(
-			'taxonomies' => [],
-		);
-
-		foreach ( $_GET as $key => $value ) {
-			if ( 0 === strpos( $key, 'filter' ) ) {
-				$taxonomy = str_replace( 'filter_', '', $key );
-
-				$filters['taxonomies'][ $taxonomy ] = array(
-					'terms' => array_fill_keys( array_map( 'trim', explode( ',', trim( $value, ',' ) ) ), true ),
-				);
-			}
-		}
-
-		return $filters;
 	}
 
 	/**

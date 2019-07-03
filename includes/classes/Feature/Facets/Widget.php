@@ -69,7 +69,7 @@ class Widget extends WP_Widget {
 			}
 		}
 
-		$selected_filters = $feature->get_selected();
+		$selected_filters = \WC_Query::get_layered_nav_chosen_attributes();
 
 		$match_type = ( ! empty( $instance['match_type'] ) ) ? $instance['match_type'] : 'all';
 
@@ -105,8 +105,8 @@ class Widget extends WP_Widget {
 		/**
 		 * Check to make sure all terms exist before proceeding
 		 */
-		if ( ! empty( $selected_filters['taxonomies'][ $taxonomy ] ) && ! empty( $selected_filters['taxonomies'][ $taxonomy ]['terms'] ) ) {
-			foreach ( $selected_filters['taxonomies'][ $taxonomy ]['terms'] as $term_slug => $nothing ) {
+		if ( ! empty( $selected_filters[ $taxonomy ] ) && ! empty( $selected_filters[ $taxonomy ]['terms'] ) ) {
+			foreach ( $selected_filters[ $taxonomy ]['terms'] as $nothing => $term_slug ) {
 				if ( empty( $terms_by_slug[ $term_slug ] ) ) {
 					/**
 					 * Term does not exist!
