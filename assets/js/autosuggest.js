@@ -198,6 +198,19 @@ function escapeDoubleQuotes( str ) {
 }
 
 /**
+ * Prepares the template for a single list item
+ *
+ * @param data The data to use in the template
+ * @returns string The item template string
+ */
+function itemTemplate ( data ) {
+       let template = `<span class="autosuggest-item" data-search="${  escapeDoubleQuotes( data.text )  }" data-url="${ data.url }">${  esc
+apeDoubleQuotes( data.text )  }</span>`;
+       template = jQuery( document ).triggerHandler( 'elasticpress.searchItem.template', [ template, data ] ) || template;
+       return `<li> ${ template } </li>`;
+}
+
+/**
  * Update the auto suggest box with new options or hide if none
  *
  * @param options
@@ -222,8 +235,7 @@ function updateAutosuggestBox( options, $localInput ) {
 	}
 
 	for ( i = 0; i < options.length; ++i ) {
-		const { text, url } = options[i];
-		itemString += `<li><span class="autosuggest-item" data-search="${  escapeDoubleQuotes( text )  }" data-url="${  url  }">${  escapeDoubleQuotes( text )  }</span></li>`;
+		itemString += itemTemplate( options[i] );
 	}
 	jQuery( itemString ).appendTo( $localSuggestList );
 
@@ -434,10 +446,12 @@ if ( epas.endpointUrl && '' !== epas.endpointUrl ) {
 							if( ! usedPosts[ postId ] ) {
 								usedPosts[ postId ] = true;
 
-								filteredObjects.push( {
+								const searchItem = {
 									'text': text,
 									'url': url
-								} );
+								};
+								const filteredObject = jQuery( document ).triggerHandler( 'elasticpress.searchItem.filter', [searchItem, element] ) || searchItem;
+								filteredObjects.push( filteredObject );
 							}
 						} );
 
